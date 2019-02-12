@@ -1,13 +1,16 @@
 import React from 'react';
 import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
 import PlaceList from './src/components/PlaceList';
-import PlaceImage from './src/assets/places.jpg'
+import PlaceImage from './src/assets/places.jpg';
+import PlaceDetail from './src/components/PlaceDetail';
+
 
 export default class App extends React.Component {
 
   state ={
     placeName:'',
-    places:[]
+    places:[],
+    selectedPlace: null
   }
 
   placeNameChangeHandler= val=>{
@@ -33,21 +36,42 @@ export default class App extends React.Component {
     });
   }
 
-  placeDeletedHandler = key =>{
+  placeDeletedHandler = ()=>{
      this.setState(prevState =>{
        return {
          places: prevState.places.filter(place=>{
-           return  key !== place.key ;
+           return  key !== prevState.selectedPlace.key ;
          })
        }
      });
   }
+
+  placeSelectedHandler = key => {
+    this.setState(prevState =>{
+      return{
+        selectedPlace: prevState.places.find(place=>{
+          return place.key === key;
+        })
+      }
+    });
+  }
+
+  modalCloseHandler =() =>{
+      this.setState({
+        selectedPlace: null
+      });
+  }
+
 
   render() {
 
    
     return (
       <View style={styles.container}>
+
+      <PlaceDetail  selectedPlace={this.state.selectedPlace} 
+            onItemDeleted={this.placeDeletedHandler}
+            onModalClosed={this.modalCloseHandler}/>
 
       <View style={styles.form_control}>
       <TextInput  
@@ -59,7 +83,7 @@ export default class App extends React.Component {
       </View>
 
       <View  style={styles.listContainer}>
-          <PlaceList places={this.state.places}  onItemDeleted={this.placeDeletedHandler}/>
+          <PlaceList places={this.state.places}  onItemSelected={this.placeSelectedHandler}/>
       </View>
     
       </View>
